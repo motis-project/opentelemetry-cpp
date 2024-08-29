@@ -159,8 +159,11 @@ message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(WITH_STL
-    "OFF"
+    "CXX20"
     CACHE STRING "Which version of the Standard Library for C++ to use")
 
 option(WITH_GSL
@@ -203,7 +206,7 @@ option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
        OFF)
 
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
-       OFF)
+       ON)
 
 option(WITH_OTLP_FILE "Whether to include the OTLP file exporter in the SDK"
        OFF)
@@ -211,7 +214,7 @@ option(WITH_OTLP_FILE "Whether to include the OTLP file exporter in the SDK"
 option(
   WITH_OTLP_HTTP_COMPRESSION
   "Whether to include gzip compression for the OTLP http exporter in the SDK"
-  OFF)
+  ON)
 
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
@@ -223,9 +226,9 @@ option(WITH_ELASTICSEARCH
 
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
-option(BUILD_TESTING "Whether to enable tests" ON)
+option(BUILD_TESTING "Whether to enable tests" OFF)
 
-option(WITH_BENCHMARK "Whether to build benchmark program" ON)
+option(WITH_BENCHMARK "Whether to build benchmark program" OFF)
 
 option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
@@ -248,6 +251,7 @@ if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
 
+# set in opentelemetry-proto cmake file
 set(OTELCPP_PROTO_PATH
     ""
     CACHE PATH "Path to opentelemetry-proto")
@@ -372,47 +376,12 @@ endif()
 if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)
-  find_package(Protobuf)
-  if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
-    if(NOT WITH_ABSEIL)
-      message(
-        FATAL_ERROR
-          "Protobuf 3.22 or upper require abseil-cpp(Recommended version: 20230125 or upper)"
-      )
-    endif()
-  endif()
 
   if(WITH_OTLP_GRPC)
+    message(WARNING "opentelemetry-cpp: gRPC not yet supported using pkg")
     find_package(gRPC)
   endif()
-  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (WITH_OTLP_GRPC
-                                                     AND NOT gRPC_FOUND))
-    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
-      install_windows_deps()
-    endif()
 
-    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
-      message(FATAL_ERROR "Windows dependency installation failed!")
-    endif()
-    if(WIN32)
-      include(${CMAKE_TOOLCHAIN_FILE})
-    endif()
-
-    if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
-      find_package(Protobuf REQUIRED)
-    endif()
-    if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
-      find_package(gRPC)
-    endif()
-    if(WIN32)
-      # Always use x64 protoc.exe
-      if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
-        set(Protobuf_PROTOC_EXECUTABLE
-            ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/packages/protobuf_x64-windows/tools/protobuf/protoc.exe
-        )
-      endif()
-    endif()
-  endif()
   # Latest Protobuf imported targets and without legacy module support
   if(TARGET protobuf::protoc)
     project_build_tools_get_imported_location(PROTOBUF_PROTOC_EXECUTABLE
@@ -453,23 +422,23 @@ endif()
 # Do we need CURL ?
 #
 
-if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
-  # No specific version required.
-  find_package(CURL REQUIRED)
-  message(STATUS "Found CURL: ${CURL_LIBRARIES}, version ${CURL_VERSION}")
-endif()
+#if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
+#  # No specific version required.
+#  find_package(CURL REQUIRED)
+#  message(STATUS "Found CURL: ${CURL_LIBRARIES}, version ${CURL_VERSION}")
+#endif()
 
 #
 # Do we need ZLIB ?
 #
 
-if((NOT WITH_API_ONLY)
-   AND WITH_HTTP_CLIENT_CURL
-   AND WITH_OTLP_HTTP_COMPRESSION)
-  # No specific version required.
-  find_package(ZLIB REQUIRED)
-  message(STATUS "Found ZLIB: ${ZLIB_LIBRARIES}, version ${ZLIB_VERSION}")
-endif()
+#if((NOT WITH_API_ONLY)
+#   AND WITH_HTTP_CLIENT_CURL
+#   AND WITH_OTLP_HTTP_COMPRESSION)
+#  # No specific version required.
+#  find_package(ZLIB REQUIRED)
+#  message(STATUS "Found ZLIB: ${ZLIB_LIBRARIES}, version ${ZLIB_VERSION}")
+#endif()
 
 #
 # Do we need NLOHMANN_JSON ?
@@ -487,7 +456,8 @@ else()
 endif()
 
 if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
-  include(cmake/nlohmann-json.cmake)
+  # Not needed, supplied by pkg
+  #include(cmake/nlohmann-json.cmake)
 endif()
 
 if(OTELCPP_MAINTAINER_MODE)
@@ -584,50 +554,7 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 include(CTest)
 if(BUILD_TESTING)
-  if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
-    # Prefer GTest from build tree. GTest is not always working with
-    # CMAKE_PREFIX_PATH
-    set(GTEST_INCLUDE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
-    if(TARGET gtest)
-      set(GTEST_BOTH_LIBRARIES gtest gtest_main)
-    else()
-      set(GTEST_BOTH_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libgtest.a
-                               ${CMAKE_BINARY_DIR}/lib/libgtest_main.a)
-    endif()
-  elseif(WIN32)
-    # Make sure we are always bootsrapped with vcpkg on Windows
-    find_package(GTest)
-    if(NOT (GTEST_FOUND OR GTest_FOUND))
-      if(DEFINED CMAKE_TOOLCHAIN_FILE)
-        message(
-          FATAL_ERROR
-            "Pleaes install GTest with the CMAKE_TOOLCHAIN_FILE at ${CMAKE_TOOLCHAIN_FILE}"
-        )
-      else()
-        install_windows_deps()
-        include(${CMAKE_TOOLCHAIN_FILE})
-        find_package(GTest REQUIRED)
-      endif()
-    endif()
-  else()
-    # Prefer GTest installed by OS distro, brew or vcpkg package manager
-    find_package(GTest REQUIRED)
-  endif()
-  if(NOT GTEST_BOTH_LIBRARIES)
-    # New GTest package names
-    if(TARGET GTest::gtest)
-      set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main)
-    elseif(TARGET GTest::GTest)
-      set(GTEST_BOTH_LIBRARIES GTest::GTest GTest::Main)
-    endif()
-  endif()
-  if(GTEST_INCLUDE_DIRS)
-    include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
-  endif()
-  message(STATUS "GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
-  message(STATUS "GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
+  set(GTEST_BOTH_LIBRARIES gtest gtest_main)
   enable_testing()
   if(WITH_BENCHMARK)
     # Benchmark respects the CMAKE_PREFIX_PATH

@@ -1,0 +1,16 @@
+[opentelemetry-proto]
+  url=git@github.com:motis-project/opentelemetry-proto.git
+  branch=main
+  commit=1624689398a3226c45994d70cb544a1e781dc032
+[protobuf]
+  url=git@github.com:motis-project/protobuf.git
+  branch=master
+  commit=d8136b9c6a62db6ce09900ecdeb82bb793096cbd
+[json]
+  url=git@github.com:motis-project/json.git
+  branch=develop
+  commit=410c74782230daaa15054d6ee0975c0607091cb3
+[curl]
+  url=git@github.com:motis-project/curl.git
+  branch=master
+  commit=72d29f0f0b34a8c3768719bc6bfbe7fdbbee6a0d
