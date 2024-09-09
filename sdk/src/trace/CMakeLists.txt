@@ -30,6 +30,7 @@ target_link_libraries(opentelemetry_trace PUBLIC opentelemetry_common
 
 target_include_directories(
   opentelemetry_trace
+  SYSTEM
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
 if(OPENTELEMETRY_INSTALL)

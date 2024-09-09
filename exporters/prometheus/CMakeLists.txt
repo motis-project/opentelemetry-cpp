@@ -17,6 +17,7 @@ set_target_version(opentelemetry_exporter_prometheus)
 
 target_include_directories(
   opentelemetry_exporter_prometheus
+  SYSTEM
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 

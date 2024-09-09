@@ -10,6 +10,7 @@ target_link_libraries(opentelemetry_resources opentelemetry_common)
 
 target_include_directories(
   opentelemetry_resources
+  SYSTEM
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
 if(OPENTELEMETRY_INSTALL)

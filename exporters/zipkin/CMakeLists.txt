@@ -9,6 +9,7 @@ add_library(
 
 target_include_directories(
   opentelemetry_exporter_zipkin_trace
+  SYSTEM
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 

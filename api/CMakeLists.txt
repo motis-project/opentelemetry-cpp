@@ -4,6 +4,7 @@
 add_library(opentelemetry_api INTERFACE)
 target_include_directories(
   opentelemetry_api
+  SYSTEM
   INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
             "$<INSTALL_INTERFACE:include>")
 

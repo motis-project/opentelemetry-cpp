@@ -30,6 +30,7 @@ set_target_version(opentelemetry_logs)
 
 target_include_directories(
   opentelemetry_logs
+  SYSTEM
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
 if(OPENTELEMETRY_INSTALL)

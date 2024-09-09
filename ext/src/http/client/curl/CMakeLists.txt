@@ -17,6 +17,7 @@ if(TARGET CURL::libcurl)
     PRIVATE CURL::libcurl)
 else()
   target_include_directories(opentelemetry_http_client_curl
+                             SYSTEM
                              INTERFACE "${CURL_INCLUDE_DIRS}")
   target_link_libraries(
     opentelemetry_http_client_curl
@@ -32,6 +33,7 @@ if(WITH_OTLP_HTTP_COMPRESSION)
       PRIVATE ZLIB::ZLIB)
   else()
     target_include_directories(opentelemetry_http_client_curl
+                               SYSTEM
                                INTERFACE "${ZLIB_INCLUDE_DIRS}")
     target_link_libraries(
       opentelemetry_http_client_curl

@@ -6,6 +6,7 @@ add_library(opentelemetry_exporter_in_memory
 
 target_include_directories(
   opentelemetry_exporter_in_memory
+  SYSTEM
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 

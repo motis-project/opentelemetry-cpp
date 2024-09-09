@@ -12,6 +12,7 @@ set_target_version(opentelemetry_otlp_recordable)
 
 target_include_directories(
   opentelemetry_otlp_recordable
+  SYSTEM
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
@@ -46,10 +47,12 @@ if(WITH_OTLP_GRPC)
   if(GRPC_INCLUDE_DIRECTORY)
     target_include_directories(
       opentelemetry_exporter_otlp_grpc_client
+      SYSTEM
       PUBLIC "$<BUILD_INTERFACE:${GRPC_INCLUDE_DIRECTORY}>")
   endif()
   target_include_directories(
     opentelemetry_exporter_otlp_grpc_client
+    SYSTEM
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
            "$<INSTALL_INTERFACE:include>")
 
@@ -129,6 +132,7 @@ if(WITH_OTLP_HTTP)
   endif()
   target_include_directories(
     opentelemetry_exporter_otlp_http_client
+    SYSTEM
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
            "$<INSTALL_INTERFACE:include>")
 
@@ -206,6 +210,7 @@ if(WITH_OTLP_FILE)
   endif()
   target_include_directories(
     opentelemetry_exporter_otlp_file_client
+    SYSTEM
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
            "$<INSTALL_INTERFACE:include>")
 
