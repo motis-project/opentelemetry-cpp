@@ -13,4 +13,4 @@
 [curl]
   url=git@github.com:motis-project/curl.git
   branch=master
-  commit=72d29f0f0b34a8c3768719bc6bfbe7fdbbee6a0d
+  commit=7a59f8325eaf49715cc2e8448711dfb7a9f7c250
