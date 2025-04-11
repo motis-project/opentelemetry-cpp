@@ -26,11 +26,11 @@ else()
 endif()
 
 if(WITH_OTLP_HTTP_COMPRESSION)
-  if(TARGET ZLIB::ZLIB)
+  if(TARGET zlibstatic)
     target_link_libraries(
       opentelemetry_http_client_curl
       PUBLIC opentelemetry_ext
-      PRIVATE ZLIB::ZLIB)
+      PRIVATE zlibstatic)
   else()
     target_include_directories(opentelemetry_http_client_curl
                                SYSTEM
