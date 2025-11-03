@@ -13,7 +13,7 @@
 [curl]
   url=git@github.com:motis-project/curl.git
   branch=master
-  commit=39c8a51e8ee0ab7ea712886df79c068405a2e008
+  commit=0743359585cf0d2bd15b9792c0460470a231d8d0
 [zlib-ng]
   url=git@github.com:motis-project/zlib-ng.git
   branch=develop
